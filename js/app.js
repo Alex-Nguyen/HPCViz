@@ -352,9 +352,9 @@ class HPCViz {
                         }else{
                             let distance = Math.pow(dat[i+1].y - dat[i].y, 2);
                             if(distance < 20*20){
-                                path += ` L${xScale(i)},${yScale(dat[i+1].y)}`
+                                path += ` L${xScale(i)},${yScale(dat[i].y)}`
                             }else{
-                                path += ` L${xScale(i+1)},${yScale(dat[i].y)}`
+                                path += ` L${xScale(i+1)},${yScale(dat[i+1].y)}`
                             }
 
                         }
