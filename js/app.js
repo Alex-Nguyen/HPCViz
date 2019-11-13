@@ -354,7 +354,7 @@ class HPCViz {
                             if(distance < 20*20){
                                 path += ` L${xScale(i)},${yScale(dat[i+1].y)}`
                             }else{
-                                path += ` L${xScale(i+1)},${yScale(dat[i+1].y)}`
+                                path += ` L${xScale(i+1)},${yScale(dat[i].y)}`
                             }
 
                         }
