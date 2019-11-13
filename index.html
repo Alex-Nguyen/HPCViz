@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>HPCC++: Visualization High Performance Computing</title>
+    <script src="libs/d3.v5.min.js"></script>
+</head>
+<style>
+    .line {
+        fill: none;
+        stroke: rgba(0,0,0,0.5);
+        stroke-width: 1;
+    }
+    .dot {
+        /*fill: #ffab00;*/
+        stroke: #fff;
+    }
+    div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: 60px;
+        height: 28px;
+        padding: 2px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+    }
+</style>
+<body>
+<svg id="main"></svg>
+</body>
+<script src="js/app.js"></script>
+</html>

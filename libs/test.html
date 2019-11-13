@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+generateLineCPUTemp2() {
+
+var div = d3.select("body").append("div")
+.attr("class", "tooltip")
+.style("opacity", 0);
+let group = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+let xScale = d3.scaleLinear()
+.domain([0, 7]) // input
+.range([0, 100]); // output
+
+let yScale = d3.scaleLinear()
+.domain([0, 100]) // input
+.range([25, 0]); // output
+let lineGraph = d3.line()
+.defined(d => !isNaN(d))
+.x(function (d, i) {
+return xScale(i);
+}) // set the x values for the line generator
+.y(function (d) {
+return yScale(d.y);
+}) // set the y values for the line generator
+.curve(d3.curveStepAfter) // apply smoothing to the line
+
+let svg_m = d3.select("#main")
+.attr("width", 1800)
+.attr("height", 1600);
+let titleGroup = svg_m.selectAll('.groupM').data(group).enter()
+titleGroup.append('rect')
+.attr('x', function (d, i) {
+return (i % 10) * 150
+})
+.attr('y', 10)
+.attr('width', 140)
+.attr('height', 1550)
+.style('fill', 'none')
+.style("stroke", 'black')
+.attr('rx', "10px")
+titleGroup.append("text").text(function (d, i) {
+return `Rack ${i + 1}`
+}).attr('y', 25).attr('x', function (d, i) {
+return (i % 10) * 150 + 40
+})
+let lines = svg_m.selectAll('.lineChart').data(this.nodes).enter()
+
+let line = lines.append("g")
+.attr("class", 'lineChart')
+.attr("id", d => d.computeName)
+.attr("transform", function (d, i) {
+
+let _removeCompute = d.computeName.slice(8);
+let _rackIndex = _removeCompute.slice(0, _removeCompute.indexOf("-"));
+let _hostIndex = _removeCompute.slice(_removeCompute.indexOf("-") + 1)
+return `translate(${((_rackIndex - 1) % 10) * 150 + 30}, ${_hostIndex * 25 + 5})`
+});
+line.append('rect').attr('x', 0).attr('y', 0).attr('width', 100).attr("height", 24).style('fill', 'rgba(0,0,0,0.02)')
+line.append('text').text(function (d) {
+let _removeCompute = d.computeName.slice(8);
+let _hostIndex = _removeCompute.slice(_removeCompute.indexOf("-") + 1)
+return _hostIndex
+}).attr('x', -25).attr("y", 15)
+line.append("path")
+.datum(function (d) {
+return d.trackedCPU2.trackedChanges.filter(lineGraph.defined())
+}) // 10. Binds data to the line
+.attr("class", "line") // Assign a class for styling
+.attr("d", function (d) {
+console.log(d)
+}); // 11. Calls the line generator
+// .attr("d", lineGraph); // 11. Calls the line generator
+
+
+
+line.selectAll(".dot")
+.data(function (d) {
+return d.trackedCPU2.trackedChanges
+})
+.enter().append("circle") // Uses the enter().append() method
+.attr("class", "dot") // Assign a class for styling
+.attr("fill", function (d) {
+if(d.y>90){
+return 'red'
+}else if(0 < d.y&& d.y<90){
+return 'blue'
+}else{
+return 'rgba(0,0,0,0.5)'
+}
+})
+.attr("cx", function (d, i) {
+return xScale(i)
+})
+.attr("cy", function (d) {
+return yScale(d.y)
+})
+.attr("r", 2).on("mouseover", function (d) {
+div.transition()
+.duration(200)
+.style("opacity", .9);
+div.html(d.y)
+.style("left", (d3.event.pageX) + "px")
+.style("top", (d3.event.pageY - 28) + "px");
+})
+.on("mouseout", function (d) {
+div.transition()
+.duration(500)
+.style("opacity", 0);
+});
+}
+</body>
+</html>
