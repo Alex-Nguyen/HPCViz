@@ -173,14 +173,15 @@ class ChangeDetector {
             }
 
         } else {
-            let lastSeen = this.trackedChanges[this.trackedChanges.length - 1]
-            if (lastSeen && lastSeen.y !== 0) {
-                this.trackedChanges.push({y: 0, index: this.trackedChanges.length, dotVisible: true})
-
-            } else {
-                this.trackedChanges.push({y: 0, index: this.trackedChanges.length, dotVisible: false})
-
-            }
+            this.trackedChanges.push({y: 0, index: this.trackedChanges.length, dotVisible: false})
+            // let lastSeen = this.trackedChanges[this.trackedChanges.length - 1];
+            // if (lastSeen && lastSeen.y !== 0) {
+            //     this.trackedChanges.push({y: 0, index: this.trackedChanges.length, dotVisible: true})
+            //
+            // } else {
+            //    
+            //
+            // }
         }
 
     }
@@ -264,7 +265,7 @@ class HPCViz {
         let svg_m = d3.select("#main")
             .attr("width", params.screen_width)
             .attr("height", params.screen_height)
-        let defaultRackWidth = (params.screen_width - 9 * params.rack_padding) / 10;
+        let defaultRackWidth = (params.screen_width - 9 * params.rack_padding) / 9;
         let defaultRackHeight = (params.screen_height) / 61;
         console.log(defaultRackHeight)
         let yScale = d3.scaleLinear()
@@ -293,36 +294,6 @@ class HPCViz {
             });
 
 
-        // let groupNode = svg_m.selectAll('.groupCompute').data(this.nodes).enter();
-        // groupNode.append("g")
-        //     .attr("class", 'groupCompute')
-        //     .attr("transform", function (d, i) {
-        //         let _removeCompute = d.computeName.slice(8);
-        //         let _rackIndex = _removeCompute.slice(0, _removeCompute.indexOf("-"));
-        //         let _hostIndex = _removeCompute.slice(_removeCompute.indexOf("-") + 1);
-        //         return `translate(${((_rackIndex - 1) % 10) * (defaultRackWidth + params.rack_padding)},${_hostIndex * (defaultRackHeight) + 20})`
-        //      });
-        // let backgroundRect = groupNode.append("rect")
-        //     .style('fill', 'rgba(0,0,0,0.1)')
-        //     .attr("height", defaultRackHeight - 2)
-        //     .attr("width", defaultRackWidth)
-        //     .attr("id", d => d.computeName)
-        // let lineChart = groupNode.append("path").datum(d=>d.trackedCPU2.trackedChanges) // 10. Binds data to the line
-        //     .attr("class", "line") // Assign a class for styling
-        //     .attr("d", function (d) {
-        //         console.log(d)
-        //         let xScale = d3.scaleLinear()
-        //             .domain([0, d.length]) // input
-        //             .range([0, defaultRackWidth]); // output
-        //       return  d3.line()
-        //             .x(function (d, i) {
-        //                 return xScale(i);
-        //             }) // set the x values for the line generator
-        //             .y(function (d) {
-        //                 return yScale(d.y);
-        //             }) // set the y values for the line generator
-        //             .curve(d3.curveStepAfter)
-        //     });
         let colorScale = d3.scaleLinear()
             .domain([0, 100]) // input
             .range([1, 0]); // output
@@ -338,29 +309,24 @@ class HPCViz {
                 .range([0, defaultRackWidth]); // output
             function drawLine(dat){
                 let path ="";
-                for(let i=0; i<dat.length-1;i++){
+                for(let i=0; i<dat.length;i++){
                     if(i===0){
-                        if(dat[i].y!==0){
-                            path =`M0,${xScale(i)} L${i*50},${yScale(dat[i+1].y)} `
-                        }else{
-                            path =`M0,${xScale(i)} L${i*50},${yScale(dat[i].y)} `
-                        }
-
+                            path =`M ${xScale(i)} ${yScale(dat[i].y)}`
                     }else{
-                        if(dat[i].y===0){
-                            path += ` M${xScale(i)},${yScale(dat[i+1].y)}`
-                        }else{
-                            let distance = Math.pow(dat[i+1].y - dat[i].y, 2);
-                            if(distance < 20*20){
-                                path += ` L${xScale(i)},${yScale(dat[i].y)}`
-                            }else{
-                                path += ` L${xScale(i+1)},${yScale(dat[i+1].y)}`
-                            }
-
+                        if(dat[i].y===0&&dat[i-1].y!==0){
+                            path += `H ${xScale(i)}`
                         }
+                        else if(dat[i].y===0&&dat[i-1].y===0){
 
+                        }else if(dat[i].y!==0&&dat[i-1].y===0){
+                            path +=`M ${xScale(i)} ${yScale(dat[i].y)} `
+                        }
+                        else{
+                            path +=`L ${xScale(i)} ${yScale(dat[i].y)} `
+                        }
                     }
                 }
+                console.log(path)
                 return path;
             }
             let lineGraph = d3.line()
@@ -378,7 +344,7 @@ class HPCViz {
                     let _removeCompute = compute.computeName.slice(8);
                     let _rackIndex = _removeCompute.slice(0, _removeCompute.indexOf("-"));
                     let _hostIndex = _removeCompute.slice(_removeCompute.indexOf("-") + 1)
-                    return `translate(${((_rackIndex - 1) % 10) * (defaultRackWidth + params.rack_padding)}, ${_hostIndex * (defaultRackHeight) + 20})`
+                    return `translate(${((_rackIndex - 1) % 10) * (defaultRackWidth + params.rack_padding)}, ${(_hostIndex * (defaultRackHeight) + 20)})`
                 });
             lineGroup.append('rect')
                 .attr('id',compute.computeName)

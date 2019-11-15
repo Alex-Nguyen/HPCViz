@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style type="text/css">
+    /* 13. Basic Styling with CSS */
+
+    /* Style the lines by removing the fill and applying a stroke */
+    .line {
+        fill: none;
+        stroke: #ffab00;
+        stroke-width: 3;
+    }
+
+    /* Style the dots by assigning a fill and stroke */
+    .dot {
+        fill: #ffab00;
+        stroke: #fff;
+    }
+
+</style>
+<!-- Body tag is where we will append our SVG and SVG objects-->
+<body>
+</body>
+
+<!-- Load in the d3 library -->
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+    var line = d3.line()
+        .defined(function (d) { return d[1] !== null; });
+
+    var data = [[0, 80], [50, 20], [100, 50], [150, 30],
+        [200, 40], [250, 90], [300, null], [350, null],
+        [400, 20], [450, 70], [500, 60]];
+
+    var filteredData = data.filter(line.defined());
+
+    d3.select('#segments-line').attr('d', line(data));
+    d3.select('#gap-line').attr('d', line(filteredData));
+    console.log(filteredData)
+
+</script>

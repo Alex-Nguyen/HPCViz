@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="libs/d3.v5.min.js"></script>
+
+</head>
+<body>
+<svg id="temperature" width="300px" height="300px">
+
+</svg>
+</body>
+<script>
+    const data = [25,25,26,28,25,60,62,61,60];
+    class ChangeDetector{
+        constructor(){
+            this.trackedChanges =[];
+
+        }
+        step(value){
+            let match = false;
+            let pushedValue = value;
+            let lastSeenValue = this.trackedChanges[this.trackedChanges.length-1];
+            let suddenChange = Math.pow(value - lastSeenValue, 2) ;
+            if(suddenChange < 400){
+                match = true;
+            }else{
+                //Check to get common value
+                for(let i = 0; i < this.trackedChanges.length-1;i++){
+                    let processValue = this.trackedChanges[i];
+                    let _change = Math.pow(value - processValue, 2)
+                    if(_change < 400){
+                        pushedValue = processValue;
+                        break;
+                    }
+                }
+            }
+
+            if(!match){
+                this.trackedChanges.push(pushedValue)
+            }
+        }
+    }
+    let changeDetector = new ChangeDetector();
+    data.forEach(value => {
+        changeDetector.step(value)
+    });
+    let svg = d3.select('#temperature');
+    for(let i = 0, j = 1; i < changeDetector.trackedChanges.length-1; i++, j = i + 1){
+        let line1x1 =i*25, line1y1 =changeDetector.trackedChanges[i];
+        let line1x2 = i*25+25, line1y2 =changeDetector.trackedChanges[i];
+        let line2x1 =line1x2, line2y1 =line1y2;
+        let line2x2 = line1x2, line2y2 =changeDetector.trackedChanges[j];
+            svg.append("line")
+            .attr('x1',line1x1).attr('y1',line1y1)
+            .attr("x2", line1x2).attr("y2",line1y2)
+            .attr("stroke",'gray')
+        svg.append("line")
+            .attr('x1',line2x1).attr('y1',line2y1)
+            .attr("x2", line1x2).attr("y2",line2y2)
+            .attr("stroke",'gray')
+        if(j===changeDetector.trackedChanges.length-1){
+            let lineLastx1 =line1x2, lineLasty1 =line2y2;
+            let lineLastx2 = line1x2 + 25, lineLasty2 =line2y2;
+            svg.append("line")
+                .attr('x1',lineLastx1).attr('y1',lineLasty1)
+                .attr("x2", lineLastx2).attr("y2",lineLasty2)
+                .attr("stroke",'gray')
+        }
+    }
+</script>
+</html>
